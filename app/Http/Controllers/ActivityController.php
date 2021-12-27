@@ -46,7 +46,7 @@ class ActivityController extends Controller
             'reminder' => $request->input('reminder'),
         ]);
 
-        event(new ToDoActivity($data, $action = 'create'));
+        event(new ToDoActivity($data, 'create'));
 
         $countact = Activity::withTrashed()->where('user_id', $auth_id)->count();
         if(auth()->user()->is_subcription === 0 && Achievement::where('user_id', $auth_id)->exists()){
@@ -98,7 +98,7 @@ class ActivityController extends Controller
         ]);
 
         $data = Activity::find($id);
-        event(new ToDoActivity($data, $action = 'edit'));
+        event(new ToDoActivity($data, 'edit'));
 
         return redirect()->route('dashboard')->withSuccess('To Do List Update Successfull');
 
@@ -107,8 +107,9 @@ class ActivityController extends Controller
     public function delete($id)
     {
         $data = Activity::find($id);
-        event(new ToDoActivity($data, $action = 'delete'));
         $data->delete();
+        
+        event(new ToDoActivity($data, 'delete'));
 
         return redirect()->route('dashboard')->withSuccess('To Do List Delete Successfull');
     }
