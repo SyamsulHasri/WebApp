@@ -40,3 +40,4 @@ Route::post('/update/{id}', [ActivityController::class, 'update'])->name('update
 Route::get('/delete/{id}', [ActivityController::class, 'delete'])->name('delete');
 
 Route::get('/upgrade', [ActivityController::class, 'upgrade'])->name('upgrade');
+

@@ -10,6 +10,7 @@ use App\Models\Achievement;
 use App\Models\Badge;
 
 use App\Events\ToDoActivity;
+use App\Jobs\SendNotificationMail;
 
 class ActivityController extends Controller
 {
@@ -47,6 +48,11 @@ class ActivityController extends Controller
         ]);
 
         event(new ToDoActivity($data, $action = 'create'));
+
+        if($data->reminder === "1"){
+            $this->dispatch(new SendNotificationMail($data->user->email));
+        }
+        
 
         $countact = Activity::withTrashed()->where('user_id', $auth_id)->count();
         if(auth()->user()->is_subcription === 0 && Achievement::where('user_id', $auth_id)->exists()){
@@ -117,11 +123,5 @@ class ActivityController extends Controller
     {
         return view('dashboard.upgrade');
     }
-
-    public static function action()
-    {
-        return $this->action;
-    }
-
-
+    
 }

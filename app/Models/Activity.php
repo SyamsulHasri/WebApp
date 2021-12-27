@@ -27,4 +27,12 @@ class Activity extends Model
         'reminder',
     ];
 
+    /**
+     * Get the user for the achievement.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
 }
