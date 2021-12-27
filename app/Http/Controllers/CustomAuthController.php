@@ -91,4 +91,5 @@ class CustomAuthController extends Controller
         
         return redirect()->route('dashboard');
     }
+
 }
