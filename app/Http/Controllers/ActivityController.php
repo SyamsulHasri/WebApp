@@ -9,6 +9,8 @@ use App\Models\Activity;
 use App\Models\Achievement;
 use App\Models\Badge;
 
+use App\Events\ToDoActivity;
+
 class ActivityController extends Controller
 {
     public function __construct()
@@ -23,6 +25,7 @@ class ActivityController extends Controller
 
     public function savetdl(Request $request)
     {
+
         $auth_id = auth()->user()->id;
 
         $request->validate([
@@ -35,13 +38,15 @@ class ActivityController extends Controller
             'date' => 'required',
         ]);
 
-        Activity::create([
+        $data = Activity::create([
             'user_id' => $auth_id,
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'date' => $request->input('date'),
             'reminder' => $request->input('reminder'),
         ]);
+
+        event(new ToDoActivity($data, $action = 'create'));
 
         $countact = Activity::withTrashed()->where('user_id', $auth_id)->count();
         if(auth()->user()->is_subcription === 0 && Achievement::where('user_id', $auth_id)->exists()){
@@ -92,14 +97,18 @@ class ActivityController extends Controller
             'reminder' => $request->input('reminder'),
         ]);
 
+        $data = Activity::find($id);
+        event(new ToDoActivity($data, $action = 'edit'));
+
         return redirect()->route('dashboard')->withSuccess('To Do List Update Successfull');
 
     }
 
     public function delete($id)
     {
-        $activity = Activity::find($id);
-        $activity->delete();
+        $data = Activity::find($id);
+        event(new ToDoActivity($data, $action = 'delete'));
+        $data->delete();
 
         return redirect()->route('dashboard')->withSuccess('To Do List Delete Successfull');
     }
@@ -107,6 +116,11 @@ class ActivityController extends Controller
     public function upgrade()
     {
         return view('dashboard.upgrade');
+    }
+
+    public static function action()
+    {
+        return $this->action;
     }
 
 
