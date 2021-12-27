@@ -25,15 +25,15 @@ class SendNotificationMail implements ShouldQueue
      */
     public $tries = 5;
 
-    /**
-     * Get the middleware the job should pass through.
-     *
-     * @return array
-     */
-    public function middleware()
-    {
-        return [new WithoutOverlapping($this->user->id)];
-    }
+    // /**
+    //  * Get the middleware the job should pass through.
+    //  *
+    //  * @return array
+    //  */
+    // public function middleware()
+    // {
+    //     return [new WithoutOverlapping($this->user->id)];
+    // }
 
     /**
      * Create a new job instance.

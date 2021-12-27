@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\ActivityController;
 
+use App\Models\Activity;
+use Carbon\Carbon;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,4 +43,16 @@ Route::post('/update/{id}', [ActivityController::class, 'update'])->name('update
 Route::get('/delete/{id}', [ActivityController::class, 'delete'])->name('delete');
 
 Route::get('/upgrade', [ActivityController::class, 'upgrade'])->name('upgrade');
+
+
+// Route::get('/cmd', function () {
+//     $activity = Activity::where('reminder', 1)->where('date', Carbon::now()->format('Y-m-d'))->get();
+
+//     foreach($activity as $act){
+//         $this->dispatch(new SendNotificationMail($act->user->email));
+//     }
+//     // dd($activity);
+// });
+
+Route::get('/cmd', [ActivityController::class, 'cmd'])->name('cmd');
 
