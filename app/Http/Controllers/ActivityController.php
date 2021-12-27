@@ -11,6 +11,7 @@ use App\Models\Badge;
 
 use App\Events\ToDoActivity;
 use App\Jobs\SendNotificationMail;
+use Carbon\Carbon;
 
 class ActivityController extends Controller
 {
@@ -49,9 +50,9 @@ class ActivityController extends Controller
 
         event(new ToDoActivity($data, 'create'));
 
-        if($data->reminder === "1"){
-            $this->dispatch(new SendNotificationMail($data->user->email));
-        }
+        // if($data->reminder === "1"){
+        //     $this->dispatch(new SendNotificationMail($data->user->email));
+        // }
         
 
         $countact = Activity::withTrashed()->where('user_id', $auth_id)->count();
@@ -123,6 +124,15 @@ class ActivityController extends Controller
     public function upgrade()
     {
         return view('dashboard.upgrade');
+    }
+
+    public function cmd()
+    {
+        $activity = Activity::where('reminder', 1)->where('date', Carbon::now()->format('Y-m-d'))->get();
+       
+        foreach($activity as $act){
+            $this->dispatch(new SendNotificationMail($act->user->email));
+        }
     }
     
 }
