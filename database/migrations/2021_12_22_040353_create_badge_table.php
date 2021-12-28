@@ -18,6 +18,7 @@ class CreateBadgeTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('badge');
+            $table->string('description');
             $table->timestamps();
         });
     }

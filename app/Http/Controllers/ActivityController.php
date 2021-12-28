@@ -10,11 +10,10 @@ use App\Models\Achievement;
 use App\Models\Badge;
 
 use App\Events\ToDoActivity;
-use App\Jobs\SendNotificationMail;
-use Carbon\Carbon;
 
 class ActivityController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -50,11 +49,6 @@ class ActivityController extends Controller
 
         event(new ToDoActivity($data, 'create'));
 
-        // if($data->reminder === "1"){
-        //     $this->dispatch(new SendNotificationMail($data->user->email));
-        // }
-        
-
         $countact = Activity::withTrashed()->where('user_id', $auth_id)->count();
         if(auth()->user()->is_subcription === 0 && Achievement::where('user_id', $auth_id)->exists()){
             //SKIP
@@ -68,10 +62,21 @@ class ActivityController extends Controller
         }
 
         $achievement = Achievement::where('user_id', $auth_id)->count();
-        if(($achievement === 2 && $countact === 20) || ($achievement === 5 && $countact === 50) || ($achievement === 10 && $countact === 100)){
+        $firstbadge = Badge::where('user_id', $auth_id)->where('description', 'first badge')->exists();
+        $secondbadge = Badge::where('user_id', $auth_id)->where('description', 'second badge')->exists();
+        $thirdbadge = Badge::where('user_id', $auth_id)->where('description', 'third badge')->exists();
+        if(($achievement === 2 && $firstbadge === false) || ($achievement === 5 && $secondbadge === false) || ($achievement === 10 && $thirdbadge === false)){
+           
+            $description = match ($achievement){
+                2 => 'first badge',
+                5 => 'second badge',
+                10 => 'third badge',
+            };
+
             Badge::create([
                 'user_id' => $auth_id,
                 'badge' => 1,
+                'description' => $description,
             ]);
         }
 
@@ -124,15 +129,6 @@ class ActivityController extends Controller
     public function upgrade()
     {
         return view('dashboard.upgrade');
-    }
-
-    public function cmd()
-    {
-        $activity = Activity::where('reminder', 1)->where('date', Carbon::now()->format('Y-m-d'))->get();
-       
-        foreach($activity as $act){
-            $this->dispatch(new SendNotificationMail($act->user->email));
-        }
     }
     
 }
